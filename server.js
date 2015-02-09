@@ -1,39 +1,34 @@
+var osc = require('node-osc');
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var PORT = process.env.PORT || 8080;
 
 app.get('/',function(req,res){
-	//request : son cabeceras y datos que nos envia el navegador.
-	//response : son todo lo que enviamos desde el servidor.
-	res.sendFile(__dirname + '/index.html');
+	res.sendFile(__dirname + '/osc.html');
 });
 
 io.on('connection',function(socket){
 	console.log("user id : %s",socket.id);
+	socket.on("config", function (obj) {
+    oscServer = new osc.Server(obj.server.port, obj.server.host);
+    oscClient = new osc.Client(obj.client.host, obj.client.port);
 
-	var channel = 'channel-a';
+    oscClient.send('/status', socket.sessionId + ' connected');
 
-	socket.broadcast.emit('message','user '+socket.id+' connected!','System');
+    oscServer.on('message', function(msg, rinfo) {
+      console.log(msg, rinfo);
+      socket.emit("message", msg);
+    });
+  });
+  socket.on("message", function (address,arg1,arg2,arg3) {
+    oscClient.send(address,arg1,arg2,arg3);
+  });
 
-	socket.join(channel);
-
-	socket.on('message',function(msj){
-		//io.emit('message',msj,socket.id);
-		io.sockets.in(channel).emit('message',msj,socket.id); //enviar a todos del canal
-		//socket.broadcast.to(channel).emit('message',msj,socket.id); //enviar a todos del canal menos a mi
-	});
-
-	socket.on('disconnect',function(){
+  socket.on('disconnect',function(){
 		console.log("Disconnect : %s",socket.id);
 	});
 
-	socket.on('change channel',function(newChannel){
-		socket.leave(channel);
-		socket.join(newChannel);
-		channel = newChannel;
-		socket.emit('change channel',newChannel);
-	});
 
 });
 

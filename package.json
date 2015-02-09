@@ -1,16 +1,22 @@
 {
-  "name": "test",
+  "name": "socket-osc",
   "version": "1.0.0",
-  "description": "testing",
+  "description": "socket-osc",
   "main": "server.js",
   "dependencies": {
     "express": "*",
-    "socket.io": "*"
+    "socket.io": "*",
+    "node-osc": "*"
   },
   "devDependencies": {},
   "scripts": {
     "start": "node server.js"
   },
+  "keywords": [
+    "osc",
+    "socket",
+    "websockets"
+  ],
   "engines": {
       "node": "0.10.31"
   },

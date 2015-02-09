@@ -7,7 +7,7 @@ Login on heroku :
 
 >git init
 
->heroku git:remote -a roomchat
+>heroku git:remote -a socket-osc
 
 >git add .
 
